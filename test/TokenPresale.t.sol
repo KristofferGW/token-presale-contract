@@ -326,10 +326,13 @@ contract TokenPresaleTest is Test {
         presale.buyTokens{value: ethAmount}();
         
         vm.prank(buyer2);
-        presale.buyTokens{value: 5 ether}(); // Meet soft cap
+        presale.buyTokens{value: 2 ether}();
+
+        vm.prank(buyer3);
+        presale.buyTokens{value: 2 ether}();
         
         // Calculate total tokens needed
-        uint256 totalTokensNeeded = (1 ether + 5 ether) * RATE;
+        uint256 totalTokensNeeded = (1 ether + 2 ether + 2 ether) * RATE;
         
         vm.startPrank(owner);
         token.approve(address(presale), totalTokensNeeded);
@@ -338,7 +341,7 @@ contract TokenPresaleTest is Test {
         
         vm.warp(endTime + 1);
         
-        vm.expectEmit(true, false, false, true);
+        vm.expectEmit(true, false, false, true, address(presale));
         emit TokenPresale.TokensClaimed(buyer1, expectedTokens);
         
         vm.prank(buyer1);
