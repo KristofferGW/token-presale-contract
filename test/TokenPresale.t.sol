@@ -371,10 +371,22 @@ contract TokenPresaleTest is Test {
     }
     
     function testClaimTokensRevertsWithNothingToClaim() public {
+        vm.warp(startTime);
+
+        vm.prank(buyer1);
+        presale.buyTokens{value: 1 ether}();
+
+        vm.prank(buyer2);
+        presale.buyTokens{value: 2 ether}();
+
+        vm.prank(buyer3);
+        presale.buyTokens{value: 2 ether}();
+
         vm.warp(endTime + 1);
         
         vm.expectRevert("Nothing to claim");
-        vm.prank(buyer1);
+        address buyer4 = address(0x5);
+        vm.prank(buyer4);
         presale.claimTokens();
     }
     
