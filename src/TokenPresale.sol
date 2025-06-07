@@ -136,22 +136,20 @@ contract TokenPresale is Ownable {
         require(block.timestamp > endTime, "Presale not ended");
         require(totalRaised >= softCap, "Soft cap not met");
 
-        payable(owner()).transfer(address(this).balance);
+        (bool success, ) = payable(owner()).call{value: address(this).balance}(
+            ""
+        );
+        require(success, "ETH transfer failed");
     }
 
-    // Withdraw unsold tokens (once only)
     function withdrawUnsoldTokens() external onlyOwner {
         require(block.timestamp > endTime, "Presale not ended");
         require(!claimedBackUnsold, "Already withdrawn");
         claimedBackUnsold = true;
 
-        // Calculate how many tokens should remain for claims
-        uint256 tokensNeededForClaims = totalSold;
         uint256 currentBalance = token.balanceOf(address(this));
-
-        if (currentBalance > tokensNeededForClaims) {
-            uint256 unsold = currentBalance - tokensNeededForClaims;
-            token.safeTransfer(owner(), unsold);
+        if (currentBalance > 0) {
+            token.safeTransfer(owner(), currentBalance);
         }
     }
 
