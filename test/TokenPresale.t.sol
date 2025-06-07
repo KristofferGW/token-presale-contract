@@ -293,10 +293,10 @@ contract TokenPresaleTest is Test {
         vm.prank(buyer2);
         presale.buyTokens{value: 2 ether}();
         vm.prank(buyer3);
-        presale.buyTokens{value: 2.5 ether}();
+        presale.buyTokens{value: 2 ether}();
         
         // Calculate total tokens needed for all purchases
-        uint256 totalTokensNeeded = (1 ether + 2 ether + 2.5 ether) * RATE;
+        uint256 totalTokensNeeded = (1 ether + 2 ether + 2 ether) * RATE;
         
         // Deposit enough tokens for all buyers
         vm.startPrank(owner);

@@ -31,7 +31,11 @@ contract TokenPresale is Ownable {
 
     bool public claimedBackUnsold = false;
 
-    event TokensPurchased(address indexed buyer, uint256 ethAmount, uint256 tokens);
+    event TokensPurchased(
+        address indexed buyer,
+        uint256 ethAmount,
+        uint256 tokens
+    );
     event TokensClaimed(address indexed user, uint256 amount);
     event Refunded(address indexed user, uint256 amount);
 
@@ -61,9 +65,18 @@ contract TokenPresale is Ownable {
 
     // Buy tokens during sale
     function buyTokens() external payable {
-        require(block.timestamp >= startTime && block.timestamp <= endTime, "Presale not active");
-        require(msg.value >= minBuy && msg.value <= maxBuy, "Amount out of range");
-        require(contributions[msg.sender] + msg.value <= maxBuy, "Max allocation exceeded");
+        require(
+            block.timestamp >= startTime && block.timestamp <= endTime,
+            "Presale not active"
+        );
+        require(
+            msg.value >= minBuy && msg.value <= maxBuy,
+            "Amount out of range"
+        );
+        require(
+            contributions[msg.sender] + msg.value <= maxBuy,
+            "Max allocation exceeded"
+        );
 
         if (whitelistEnabled) {
             require(whitelist[msg.sender], "Not whitelisted");
@@ -94,7 +107,10 @@ contract TokenPresale is Ownable {
         require(totalRaised >= softCap, "Soft cap not met");
         uint256 amount = claimableTokens[msg.sender];
         require(amount > 0, "Nothing to claim");
-        require(token.balanceOf(address(this)) >= amount, "Not enough tokens in contract");
+        require(
+            token.balanceOf(address(this)) >= amount,
+            "Not enough tokens in contract"
+        );
 
         claimableTokens[msg.sender] = 0;
         token.safeTransfer(msg.sender, amount);
@@ -129,8 +145,12 @@ contract TokenPresale is Ownable {
         require(!claimedBackUnsold, "Already withdrawn");
         claimedBackUnsold = true;
 
-        uint256 unsold = token.balanceOf(address(this)) - totalSold;
-        if (unsold > 0) {
+        // Calculate how many tokens should remain for claims
+        uint256 tokensNeededForClaims = totalSold;
+        uint256 currentBalance = token.balanceOf(address(this));
+
+        if (currentBalance > tokensNeededForClaims) {
+            uint256 unsold = currentBalance - tokensNeededForClaims;
             token.safeTransfer(owner(), unsold);
         }
     }
